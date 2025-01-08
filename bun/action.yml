@@ -57,12 +57,12 @@ runs:
     - name: Entry
       shell: bash
       run: bun run ./dist/bun.js
-      with:
-        debug: ${{ inputs.debug }}
-        script: ${{ inputs.script }}
-        packages: ${{ inputs.packages }}
-        auto_install: ${{ inputs.auto_install }}
-        silent: ${{ inputs.silent }}
+      env:
+        INPUT_DEBUG: ${{ inputs.debug }}
+        INPUT_SCRIPT: ${{ inputs.script }}
+        INPUT_PACKAGES: ${{ inputs.packages }}
+        INPUT_AUTO_INSTALL: ${{ inputs.auto_install }}
+        INPUT_SILENT: ${{ inputs.silent }}
 
 branding:
   icon: code
