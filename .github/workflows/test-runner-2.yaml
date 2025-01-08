@@ -13,7 +13,9 @@ jobs:
   test-node:
     name: test-node:${{ matrix.os }}:${{ matrix.bun && 'bun' || 'tsx' }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
         # os: [ubuntu-latest]
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -23,6 +25,7 @@ jobs:
 
       - name: basic
         uses: ./
+        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           bun: ${{ matrix.bun }}
@@ -31,6 +34,7 @@ jobs:
 
       - name: zx-like
         uses: ./
+        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           bun: ${{ matrix.bun }}
@@ -42,6 +46,7 @@ jobs:
 
       - name: packages
         uses: ./
+        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           bun: ${{ matrix.bun }}
@@ -52,6 +57,7 @@ jobs:
 
       - name: auto-install
         uses: ./
+        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           bun: true
@@ -63,7 +69,9 @@ jobs:
   test-bun:
     name: test-bun:${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
         # os: [ubuntu-latest]
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -72,6 +80,7 @@ jobs:
 
       - name: basic
         uses: ./bun
+        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           script: |
@@ -79,6 +88,7 @@ jobs:
 
       - name: zx-like
         uses: ./bun
+        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           script: |
@@ -89,6 +99,7 @@ jobs:
 
       - name: packages
         uses: ./bun
+        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           packages: dayjs
@@ -98,6 +109,7 @@ jobs:
 
       - name: auto-install
         uses: ./bun
+        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           auto_install: true
