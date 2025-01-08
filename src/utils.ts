@@ -6,7 +6,7 @@ import process from 'node:process'
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import handlebars from 'handlebars'
-import { cyan, yellow } from 'kolorist'
+import { cyan } from 'kolorist'
 import { isDebug } from './config.js'
 
 /**
@@ -36,21 +36,29 @@ export function createLogger(ns: string) {
 
 /**
  * Install bun from official site or local file
+ * OS: win32 | linux | darwin
  */
 export async function installBun(): Promise<void> {
   const startTime = performance.now()
-  const os = process.platform
-  const arch = process.arch
+  // win32 | linux | darwin
+  const os = process.platform.toLowerCase()
+  const arch = process.arch.toLowerCase()
   core.info(`System: ${cyan(os)} ${cyan(arch)}`)
 
-  const fileName = `./public/bun-${os.toLowerCase()}-${arch.toLowerCase()}.zip`
+  const fileName = `./public/bun-${os}-${arch}.zip`
 
   const existFile = await fs.access(fileName).then(() => true).catch(() => false)
   if (!existFile) {
     core.info(`Install from shell script <https://bun.sh/install>`)
     process.env.BUN_INSTALL = '/usr/local'
-    await execCommand('curl -fsSL https://bun.sh/install -o /tmp/bun-install.sh')
-    await execCommand('bash /tmp/bun-install.sh')
+    if (os !== 'win32') {
+      await execCommand('curl -fsSL https://bun.sh/install -o /tmp/bun-install.sh')
+      await execCommand('bash /tmp/bun-install.sh')
+    }
+    else {
+      // powershell -c "irm bun.sh/install.ps1|iex"
+      await execCommand('powershell -c "irm bun.sh/install.ps1|iex"')
+    }
   }
   else {
     core.info(`Install from local file ${cyan(fileName)}`)
