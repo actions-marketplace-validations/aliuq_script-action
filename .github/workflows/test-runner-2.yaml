@@ -59,7 +59,7 @@ jobs:
             console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
 
   test-bun:
-    name: ${{ matrix.os }}
+    name: test-bun:${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
