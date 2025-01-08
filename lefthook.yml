@@ -11,4 +11,4 @@ pre-commit:
       stage_fixed: true
     test:
       glob: '.github/workflows/*.{yml,yaml}'
-      run: act -W .github/workflows/test-runner-1.yaml -p=false workflow_dispatch
+      run: act -W .github/workflows/test-runner-2.yaml -p=false workflow_dispatch
