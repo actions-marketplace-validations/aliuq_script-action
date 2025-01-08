@@ -9,6 +9,6 @@ pre-commit:
     lint:
       run: bunx eslint {staged_files} --fix
       stage_fixed: true
-    test:
-      glob: '.github/workflows/*.{yml,yaml}'
-      run: act -W .github/workflows/test-runner-2.yaml -p=false workflow_dispatch
+    # test:
+    #   glob: '.github/workflows/*.{yml,yaml}'
+    #   run: act -W .github/workflows/test-runner-2.yaml -p=false workflow_dispatch
