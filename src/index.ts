@@ -50,10 +50,13 @@ async function run(): Promise<void> {
       // Handle external packages
       await fs.mkdir(moduleDir, { recursive: true })
       core.info('Extracting tarball to node_modules')
-      await execCommand(`tar -zxvf ./public/tsx.tar.gz -C ${moduleDir}`, [])
+      const resultTar = await execCommand(`tar -zxvf ./public/tsx.tar.gz -C ${moduleDir}`, [], { silent: true })
+      await core.group('Extract Details', async () => core.info(resultTar))
+
       const pkgFile = path.join(moduleDir, 'package.json')
       const pkgLockFile = path.join(moduleDir, 'package-lock.json')
-      await execCommand(`mv ${pkgFile} ${pkgLockFile} ${tmpDir}`, [], { silent: false })
+      const resultMv = await execCommand(`mv ${pkgFile} ${pkgLockFile} ${tmpDir}`, [], { silent: true })
+      await core.group('Move Details', async () => core.info(resultMv))
 
       // Handle packages
       // e.g. packages: zod, axios, typescript zx
