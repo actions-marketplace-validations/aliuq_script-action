@@ -8,6 +8,15 @@ on:
         type: boolean
         required: false
         default: false
+      os:
+        description: Operating System
+        type: choice
+        required: true
+        default: ubuntu-latest
+        options:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
 
 jobs:
   test-node:
@@ -18,14 +27,13 @@ jobs:
       fail-fast: false
       matrix:
         # os: [ubuntu-latest]
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: ${{ inputs.os }}
         bun: [true, false]
     steps:
       - uses: actions/checkout@v4
 
       - name: basic
         uses: ./
-        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           bun: ${{ matrix.bun }}
@@ -34,7 +42,6 @@ jobs:
 
       - name: zx-like
         uses: ./
-        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           bun: ${{ matrix.bun }}
@@ -46,7 +53,6 @@ jobs:
 
       - name: packages
         uses: ./
-        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           bun: ${{ matrix.bun }}
@@ -57,7 +63,6 @@ jobs:
 
       - name: auto-install
         uses: ./
-        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           bun: true
@@ -74,13 +79,13 @@ jobs:
       fail-fast: false
       matrix:
         # os: [ubuntu-latest]
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        # os: [ubuntu-latest, windows-latest, macos-latest]
+        os: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v4
 
       - name: basic
         uses: ./bun
-        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           script: |
@@ -88,7 +93,6 @@ jobs:
 
       - name: zx-like
         uses: ./bun
-        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           script: |
@@ -99,7 +103,6 @@ jobs:
 
       - name: packages
         uses: ./bun
-        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           packages: dayjs
@@ -109,7 +112,6 @@ jobs:
 
       - name: auto-install
         uses: ./bun
-        continue-on-error: true
         with:
           debug: ${{ inputs.debug }}
           auto_install: true
