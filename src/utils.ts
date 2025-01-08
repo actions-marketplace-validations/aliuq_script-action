@@ -52,6 +52,8 @@ export async function installBun(): Promise<string> {
   const bunFile = path.join(binDir, 'bun')
   core.info(`Home directory: ${cyan(process.env.HOME!)}`)
   core.info(`Set Bun install directory: ${cyan(process.env.BUN_INSTALL!)}`)
+  // eslint-disable-next-line no-console
+  console.log(process.env)
 
   const existFile = await fs.access(fileName).then(() => true).catch(() => false)
   if (!existFile) {
