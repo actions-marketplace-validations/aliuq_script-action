@@ -1,6 +1,6 @@
 import type { Buffer } from 'node:buffer'
 import fs from 'node:fs/promises'
-import { tmpdir as osTmpdir } from 'node:os'
+import { homedir, tmpdir as osTmpdir } from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import * as core from '@actions/core'
@@ -74,7 +74,7 @@ export async function installBun(): Promise<string> {
   await execCommand('pwsh -c "$env:PATH"', [], { silent: false })
 
   // eslint-disable-next-line no-console
-  console.log(process.env)
+  console.log('homedir()', homedir())
 
   // const version = await exec.getExecOutput(`${bunFile} --version`, [], { silent: true })
   // core.info(`Bun version: ${cyan(version.stdout.trim())}`)
