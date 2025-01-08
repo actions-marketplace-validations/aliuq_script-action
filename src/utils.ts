@@ -66,7 +66,7 @@ export async function installBun(): Promise<void> {
     await execCommand(`unzip -o -j ${fileName} -d /usr/local/bin`)
   }
 
-  const version = await exec.getExecOutput('bun --version', [], { silent: true })
+  const version = await exec.getExecOutput(`${process.env.BUN_INSTALL}/bin/bun --version`, [], { silent: true })
   core.info(`Bun version: ${cyan(version.stdout.trim())}`)
   core.info(`Spend Time: ${cyan(performance.now() - startTime)}ms`)
 }
