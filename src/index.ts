@@ -3,6 +3,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import * as core from '@actions/core'
 import { cyan, green, yellow } from 'kolorist'
+import { isAct } from './config.js'
 import { execCommand, installBun, renderTemplates, tmpdir } from './utils.js'
 
 async function run(): Promise<void> {
@@ -21,10 +22,12 @@ async function run(): Promise<void> {
     const enableZx = isBuildNode ? core.getInput('zx', { required: false }) === 'true' : false
 
     core.info(`Mode: ${isBuildNode ? green('node') : green('bun')}`)
+    let bunFile: string = 'bun'
 
     if (enableBun) {
       core.info(`Runner: ${green('bun')}`)
-      isBuildNode && await installBun()
+      isBuildNode && (bunFile = await installBun())
+      core.info(`Bun: ${cyan(bunFile)}`)
     }
     else {
       core.info(`Runner: ${green('tsx')}`)
@@ -51,7 +54,7 @@ async function run(): Promise<void> {
       await fs.mkdir(moduleDir, { recursive: true })
       core.info('Extracting tarball to node_modules')
       const resultTar = await execCommand(`tar -zxvf ./public/tsx.tar.gz -C ${moduleDir}`, [], { silent: true })
-      await core.group('Extract Details', async () => core.info(resultTar))
+      !isAct && await core.group('Extract Details', async () => core.info(resultTar))
 
       const pkgFile = path.join(moduleDir, 'package.json')
       const pkgLockFile = path.join(moduleDir, 'package-lock.json')
@@ -61,7 +64,7 @@ async function run(): Promise<void> {
       // e.g. packages: zod, axios, typescript zx
       const newPackages = packages?.length === 1 ? packages[0].split(/[,\s]+/g) : packages
       if (newPackages?.length) {
-        const installer = enableBun ? 'bun' : 'npm'
+        const installer = enableBun ? bunFile : 'npm'
         core.info(`Use ${yellow(installer)} to install packages ${yellow(newPackages.join(', '))}`)
         await execRun(installer, ['install', ...newPackages], { silent })
       }
@@ -85,8 +88,7 @@ async function run(): Promise<void> {
 
     // Run script
     if (enableBun) {
-      const cmd = isBuildNode ? '/usr/local/bin/bun' : 'bun'
-      await execRun(`${cmd} run -i ${mainFile}`, [], { silent })
+      await execRun(`${bunFile} run -i ${mainFile}`, [], { silent })
     }
     else {
       const tsxCli = path.join(moduleDir, 'tsx', 'dist', 'cli.mjs')

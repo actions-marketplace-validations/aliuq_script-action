@@ -38,7 +38,7 @@ export function createLogger(ns: string) {
  * Install bun from official site or local file
  * OS: win32 | linux | darwin
  */
-export async function installBun(): Promise<void> {
+export async function installBun(): Promise<string> {
   const startTime = performance.now()
   // win32 | linux | darwin
   const os = process.platform.toLowerCase()
@@ -47,10 +47,14 @@ export async function installBun(): Promise<void> {
 
   const fileName = `./public/bun-${os}-${arch}.zip`
 
+  process.env.BUN_INSTALL = process.env.HOME || '/'
+  const binDir = path.join(process.env.BUN_INSTALL!, 'bin')
+  const bunFile = path.join(binDir, 'bun')
+  core.info(`Set Bun install directory: ${cyan(process.env.BUN_INSTALL!)}`)
+
   const existFile = await fs.access(fileName).then(() => true).catch(() => false)
   if (!existFile) {
     core.info(`Install from shell script <https://bun.sh/install>`)
-    process.env.BUN_INSTALL = '/usr/local'
     if (os !== 'win32') {
       await execCommand('curl -fsSL https://bun.sh/install -o /tmp/bun-install.sh')
       await execCommand('bash /tmp/bun-install.sh')
@@ -62,13 +66,14 @@ export async function installBun(): Promise<void> {
   }
   else {
     core.info(`Install from local file ${cyan(fileName)}`)
-    // /usr/local/bin/bun-linux-x64/
-    await execCommand(`unzip -o -j ${fileName} -d /usr/local/bin`)
+    await execCommand(`unzip -o -j ${fileName} -d ${binDir}`)
   }
 
-  const version = await exec.getExecOutput(`${process.env.BUN_INSTALL}/bin/bun --version`, [], { silent: true })
+  const version = await exec.getExecOutput(`${bunFile} --version`, [], { silent: true })
   core.info(`Bun version: ${cyan(version.stdout.trim())}`)
   core.info(`Spend Time: ${cyan(performance.now() - startTime)}ms`)
+
+  return bunFile
 }
 
 /**
