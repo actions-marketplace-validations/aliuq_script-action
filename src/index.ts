@@ -2,7 +2,6 @@ import type * as exec from '@actions/exec'
 import fs from 'node:fs/promises'
 import * as core from '@actions/core'
 import { cyan, green, yellow } from 'kolorist'
-import { isDebug } from './config.js'
 import { execCommand, installBun, renderTemplates, tmpdir } from './utils.js'
 
 async function run(): Promise<void> {
@@ -50,7 +49,7 @@ async function run(): Promise<void> {
       // Handle external packages
       await fs.mkdir(moduleDir, { recursive: true })
       core.info('Extracting tarball to node_modules')
-      await execCommand(`tar -zxvf ./public/tsx.tar.gz -C ${moduleDir}`, [], { silent: isDebug })
+      await execCommand(`tar -zxvf ./public/tsx.tar.gz -C ${moduleDir}`, [])
       await execCommand(`mv ${moduleDir}/package.json ${moduleDir}/package-lock.json ${tmpDir}`, [], { silent: false })
 
       // Handle packages
