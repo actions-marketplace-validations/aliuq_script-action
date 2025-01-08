@@ -50,6 +50,7 @@ export async function installBun(): Promise<string> {
   process.env.BUN_INSTALL = process.env.HOME || '/'
   const binDir = path.join(process.env.BUN_INSTALL!, 'bin')
   const bunFile = path.join(binDir, 'bun')
+  core.info(`Home directory: ${cyan(process.env.HOME!)}`)
   core.info(`Set Bun install directory: ${cyan(process.env.BUN_INSTALL!)}`)
 
   const existFile = await fs.access(fileName).then(() => true).catch(() => false)
