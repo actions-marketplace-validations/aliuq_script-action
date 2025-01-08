@@ -1,0 +1,90 @@
+name: Test Runner 2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-node:
+    name: ${{ matrix.os }}:${{ matrix.bun && 'bun' || 'tsx' }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        bun: [true, false]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: basic
+        uses: ./
+        with:
+          bun: ${{ matrix.bun }}
+          script: |
+            console.log('Test basic')
+
+      - name: zx-like
+        uses: ./
+        with:
+          bun: ${{ matrix.bun }}
+          script: |
+            const list = await $`ls -al .`.text()
+            console.log(list)
+
+            await $`echo "Hello World by bun"`
+
+      - name: packages
+        uses: ./
+        with:
+          bun: ${{ matrix.bun }}
+          packages: dayjs
+          script: |
+            import dayjs from 'dayjs'
+            console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+
+      - name: auto-install
+        uses: ./
+        with:
+          bun: true
+          auto_install: true
+          script: |
+            import dayjs from 'dayjs'
+            console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+
+  test-bun:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: basic
+        uses: ./bun
+        with:
+          script: |
+            console.log('Test basic')
+
+      - name: zx-like
+        uses: ./bun
+        with:
+          script: |
+            const list = await $`ls -al .`.text()
+            console.log(list)
+
+            await $`echo "Hello World by bun"`
+
+      - name: packages
+        uses: ./bun
+        with:
+          packages: dayjs
+          script: |
+            import dayjs from 'dayjs'
+            console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+
+      - name: auto-install
+        uses: ./bun
+        with:
+          auto_install: true
+          script: |
+            import dayjs from 'dayjs'
+            console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))

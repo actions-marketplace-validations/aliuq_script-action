@@ -1,0 +1,39 @@
+name: Execute Typescript Script(esm)
+author: AliuQ
+description: Execute scripts with `bun` or `tsx`, supporting ESM modules and google/zx
+inputs:
+  debug:
+    description: Debug mode
+    required: false
+    default: 'false'
+  script:
+    description: Script content
+    required: true
+  packages:
+    description: Install packages before running script
+    required: false
+    default: ''
+  bun:
+    description: Run script with bun
+    required: false
+    default: 'true'
+  auto_install:
+    description: Auto install packages, only works with `bun`, If set, `packages` will be ignored
+    required: false
+    default: 'false'
+  zx:
+    description: Support using google/zx library, only works when `bun` is `false`
+    required: false
+    default: 'true'
+  silent:
+    description: Silent mode for script
+    required: false
+    default: 'false'
+
+runs:
+  using: node20
+  main: dist/index.js
+
+branding:
+  icon: code
+  color: blue

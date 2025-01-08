@@ -1,0 +1,63 @@
+name: Execute Typescript Script(esm)
+author: AliuQ
+description: Execute scripts with `bun` or `tsx`, supporting ESM modules and google/zx
+inputs:
+  debug:
+    description: Debug mode
+    required: false
+    default: 'false'
+  script:
+    description: Script content
+    required: true
+  packages:
+    description: Install packages before running script
+    required: false
+    default: ''
+  auto_install:
+    description: Auto install packages, only works with `bun`, If set, `packages` will be ignored
+    required: false
+    default: 'false'
+  silent:
+    description: Silent mode for script
+    required: false
+    default: 'false'
+
+  # https://github.com/oven-sh/setup-bun
+  bun-version:
+    description: The version of Bun to download and install.
+    required: false
+    default: 1.1.42
+  bun-version-file:
+    description: The version of Bun to download and install from file.
+    required: false
+  bun-download-url:
+    description: URL to download .zip file for Bun release
+    required: false
+  registry-url:
+    description: Registry URL where some private package is stored.
+    required: false
+  scope:
+    description: Scope for private packages.
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: ${{ inputs.bun-version }}
+        bun-version-file: ${{ inputs.bun-version-file }}
+        bun-download-url: ${{ inputs.bun-download-url }}
+        registry-url: ${{ inputs.registry-url }}
+        scope: ${{ inputs.scope }}
+
+    - name: Entry
+      shell: bash
+      run: bun run ./dist/bun.js
+
+branding:
+  icon: code
+  color: blue
