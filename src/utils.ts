@@ -43,21 +43,23 @@ export async function installBun(): Promise<string> {
   // win32 | linux | darwin
   const os = process.platform.toLowerCase()
   const arch = process.arch.toLowerCase()
-  // const isWin = os === 'win32'
+  const isWin = os === 'win32'
   core.info(`System: ${cyan(os)} ${cyan(arch)}`)
 
   const fileName = `./public/bun-${os}-${arch}.zip`
 
-  // process.env.BUN_INSTALL = isWin ? 'c:\\' : (process.env.HOME || '/')
-  // const binDir = path.join(process.env.BUN_INSTALL!, 'bin')
-  // const bunFile = path.join(binDir, 'bun')
-  core.info(`Home directory: ${cyan(process.env.HOME!)}`)
-  core.info(`Set Bun install directory: ${cyan(process.env.BUN_INSTALL!)}`)
+  // According to the official website, the installation directory is `~/.bun`
+  // ~/.bun/bin/bun or C:\Users\runneradmin\.bun\bin\bun.exe
+  const installDir = path.join(process.env.BUN_INSTALL || homedir(), '.bun')
+  const binDir = path.join(installDir, 'bin')
+  const bunFile = path.join(binDir, 'bun')
+
+  core.info(`Set Bun install directory: ${cyan(bunFile)}`)
 
   const existFile = await fs.access(fileName).then(() => true).catch(() => false)
   if (!existFile) {
     core.info(`Install from shell script <https://bun.sh/install>`)
-    if (os !== 'win32') {
+    if (!isWin) {
       await execCommand('curl -fsSL https://bun.sh/install -o /tmp/bun-install.sh')
       await execCommand('bash /tmp/bun-install.sh')
     }
@@ -68,20 +70,14 @@ export async function installBun(): Promise<string> {
   }
   else {
     core.info(`Install from local file ${cyan(fileName)}`)
-    // await execCommand(`unzip -o -j ${fileName} -d ${binDir}`)
+    await execCommand(`unzip -o -j ${fileName} -d ${binDir}`)
   }
 
-  await execCommand('pwsh -c "$env:PATH"', [], { silent: false })
-
-  // eslint-disable-next-line no-console
-  console.log('homedir()', homedir())
-
-  // const version = await exec.getExecOutput(`${bunFile} --version`, [], { silent: true })
-  // core.info(`Bun version: ${cyan(version.stdout.trim())}`)
+  const version = await exec.getExecOutput(`${bunFile} --version`, [], { silent: true })
+  core.info(`Bun version: ${cyan(version.stdout.trim())}`)
   core.info(`Spend Time: ${cyan(performance.now() - startTime)}ms`)
 
-  // return bunFile
-  return ''
+  return bunFile
 }
 
 /**
