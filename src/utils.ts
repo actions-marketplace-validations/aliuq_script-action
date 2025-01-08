@@ -71,7 +71,7 @@ export async function installBun(): Promise<string> {
     // await execCommand(`unzip -o -j ${fileName} -d ${binDir}`)
   }
 
-  await execCommand('Get-Command bun', [], { silent: false })
+  await execCommand('pwsh -c "Get-Command bun"', [], { silent: false })
 
   // eslint-disable-next-line no-console
   console.log(process.env)
