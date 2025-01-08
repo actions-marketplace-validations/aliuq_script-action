@@ -43,13 +43,14 @@ export async function installBun(): Promise<string> {
   // win32 | linux | darwin
   const os = process.platform.toLowerCase()
   const arch = process.arch.toLowerCase()
+  // const isWin = os === 'win32'
   core.info(`System: ${cyan(os)} ${cyan(arch)}`)
 
   const fileName = `./public/bun-${os}-${arch}.zip`
 
-  process.env.BUN_INSTALL = process.env.HOME || '/'
-  const binDir = path.join(process.env.BUN_INSTALL!, 'bin')
-  const bunFile = path.join(binDir, 'bun')
+  // process.env.BUN_INSTALL = isWin ? 'c:\\' : (process.env.HOME || '/')
+  // const binDir = path.join(process.env.BUN_INSTALL!, 'bin')
+  // const bunFile = path.join(binDir, 'bun')
   core.info(`Home directory: ${cyan(process.env.HOME!)}`)
   core.info(`Set Bun install directory: ${cyan(process.env.BUN_INSTALL!)}`)
   // eslint-disable-next-line no-console
@@ -69,14 +70,15 @@ export async function installBun(): Promise<string> {
   }
   else {
     core.info(`Install from local file ${cyan(fileName)}`)
-    await execCommand(`unzip -o -j ${fileName} -d ${binDir}`)
+    // await execCommand(`unzip -o -j ${fileName} -d ${binDir}`)
   }
 
-  const version = await exec.getExecOutput(`${bunFile} --version`, [], { silent: true })
-  core.info(`Bun version: ${cyan(version.stdout.trim())}`)
+  // const version = await exec.getExecOutput(`${bunFile} --version`, [], { silent: true })
+  // core.info(`Bun version: ${cyan(version.stdout.trim())}`)
   core.info(`Spend Time: ${cyan(performance.now() - startTime)}ms`)
 
-  return bunFile
+  // return bunFile
+  return ''
 }
 
 /**
