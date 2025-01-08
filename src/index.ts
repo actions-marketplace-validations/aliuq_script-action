@@ -1,5 +1,6 @@
 import type * as exec from '@actions/exec'
 import fs from 'node:fs/promises'
+import path from 'node:path'
 import * as core from '@actions/core'
 import { cyan, green, yellow } from 'kolorist'
 import { execCommand, installBun, renderTemplates, tmpdir } from './utils.js'
@@ -30,8 +31,8 @@ async function run(): Promise<void> {
     }
 
     const tmpDir = await tmpdir()
-    const moduleDir = `${tmpDir}/node_modules`
-    const mainFile = `${tmpDir}/src/index.ts`
+    const moduleDir = path.join(tmpDir, 'node_modules')
+    const mainFile = path.join(tmpDir, 'src', 'index.ts')
     core.info(`Directory: ${cyan(tmpDir)}`)
 
     const execRun = async (command: string, args?: string[], options?: exec.ExecOptions): Promise<any> => {
@@ -50,7 +51,9 @@ async function run(): Promise<void> {
       await fs.mkdir(moduleDir, { recursive: true })
       core.info('Extracting tarball to node_modules')
       await execCommand(`tar -zxvf ./public/tsx.tar.gz -C ${moduleDir}`, [])
-      await execCommand(`mv ${moduleDir}/package.json ${moduleDir}/package-lock.json ${tmpDir}`, [], { silent: false })
+      const pkgFile = path.join(moduleDir, 'package.json')
+      const pkgLockFile = path.join(moduleDir, 'package-lock.json')
+      await execCommand(`mv ${pkgFile} ${pkgLockFile} ${tmpDir}`, [], { silent: false })
 
       // Handle packages
       // e.g. packages: zod, axios, typescript zx
@@ -81,7 +84,8 @@ async function run(): Promise<void> {
       await execRun(`bun run -i ${mainFile}`, [], { silent })
     }
     else {
-      await execRun(`${moduleDir}/tsx/dist/cli.mjs ${mainFile}`, [], { silent })
+      const tsxCli = path.join(moduleDir, 'tsx', 'dist', 'cli.mjs')
+      await execRun(`${tsxCli} ${mainFile}`, [], { silent })
     }
 
     core.setOutput('status', 'success')

@@ -1,0 +1,125 @@
+name: Test Runner 1
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-1:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        # bun: [true, false]
+        # packages: ['', dayjs]
+        # auto_install: [false, true]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: test basic with bun
+        uses: ./
+        with:
+          script: |
+            console.log('Test basic')
+
+      - name: test basic with tsx
+        uses: ./
+        with:
+          bun: false
+          script: |
+            console.log('Test basic')
+
+      - name: test zx-like with bun
+        uses: ./
+        with:
+          bun: false
+          script: |
+            const list = await $`ls -al`.text()
+            console.log(list)
+
+            await $`echo "Hello World by bun"`
+
+      - name: test zx with tsx
+        uses: ./
+        with:
+          bun: false
+          script: |
+            const list = await $`ls -al`.text()
+            console.log(list)
+
+            const result = await $`echo "Hello World by zx"`
+            console.log('No output here!!!')
+            console.log(result)
+
+      - name: Test packages with bun
+        uses: ./
+        with:
+          packages: dayjs
+          script: |
+            import dayjs from 'dayjs'
+            console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+
+      - name: Test packages with tsx
+        uses: ./
+        with:
+          packages: dayjs
+          bun: false
+          script: |
+            import dayjs from 'dayjs'
+            console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+
+      - name: Test packages auto_install with bun
+        uses: ./
+        with:
+          auto_install: true
+          script: |
+            import dayjs from 'dayjs'
+            console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+
+  test-2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: test basic with bun
+        uses: ./bun
+        with:
+          script: |
+            console.log('Test basic')
+
+      - name: test zx-like with bun
+        uses: ./
+        with:
+          bun: false
+          script: |
+            const list = await $`ls -al`.text()
+            console.log(list)
+
+            await $`echo "Hello World by bun"`
+
+      - name: Test packages with bun
+        uses: ./
+        with:
+          packages: dayjs
+          script: |
+            import dayjs from 'dayjs'
+            console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+
+      - name: Test packages auto_install with bun
+        uses: ./
+        with:
+          auto_install: true
+          script: |
+            import dayjs from 'dayjs'
+            console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: test basic with bun
+        uses: ./
+        with:
+          bun: true
+          packages: dayjs
+          script: |
+            import dayjs from 'dayjs'
+            console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
