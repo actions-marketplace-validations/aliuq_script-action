@@ -20,3 +20,5 @@ bun build ./src/index.ts \
 #     --sourcemap=linked \
 #     --entry-naming "[dir]/bun.[ext]" \
 #     --define "MY_BUILD_MODE='bun'"
+
+
