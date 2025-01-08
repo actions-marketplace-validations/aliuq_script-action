@@ -8,6 +8,7 @@ pre-commit:
   commands:
     lint:
       run: bunx eslint {staged_files} --fix
+      exclude: 'dist/*'
       stage_fixed: true
     # test:
     #   glob: '.github/workflows/*.{yml,yaml}'
