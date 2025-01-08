@@ -53,8 +53,6 @@ export async function installBun(): Promise<string> {
   // const bunFile = path.join(binDir, 'bun')
   core.info(`Home directory: ${cyan(process.env.HOME!)}`)
   core.info(`Set Bun install directory: ${cyan(process.env.BUN_INSTALL!)}`)
-  // eslint-disable-next-line no-console
-  console.log(process.env)
 
   const existFile = await fs.access(fileName).then(() => true).catch(() => false)
   if (!existFile) {
@@ -72,6 +70,9 @@ export async function installBun(): Promise<string> {
     core.info(`Install from local file ${cyan(fileName)}`)
     // await execCommand(`unzip -o -j ${fileName} -d ${binDir}`)
   }
+
+  // eslint-disable-next-line no-console
+  console.log(process.env)
 
   // const version = await exec.getExecOutput(`${bunFile} --version`, [], { silent: true })
   // core.info(`Bun version: ${cyan(version.stdout.trim())}`)
