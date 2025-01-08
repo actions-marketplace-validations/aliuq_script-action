@@ -1,0 +1,23 @@
+name: Test Windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: Debug mode
+        type: boolean
+        required: false
+        default: true
+
+jobs:
+  test-node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: basic
+        uses: ./
+        with:
+          debug: ${{ inputs.debug }}
+          script: |
+            console.log('Test basic')
