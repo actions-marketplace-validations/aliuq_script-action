@@ -55,8 +55,7 @@ async function run(): Promise<void> {
 
       const pkgFile = path.join(moduleDir, 'package.json')
       const pkgLockFile = path.join(moduleDir, 'package-lock.json')
-      const resultMv = await execCommand(`mv ${pkgFile} ${pkgLockFile} ${tmpDir}`, [], { silent: true })
-      await core.group('Move Details', async () => core.info(resultMv))
+      await execCommand(`mv ${pkgFile} ${pkgLockFile} ${tmpDir}`, [], { silent: true })
 
       // Handle packages
       // e.g. packages: zod, axios, typescript zx
@@ -74,17 +73,20 @@ async function run(): Promise<void> {
     // Handle script
     const newScript = script
     await core.group('Script', async () => core.info(newScript))
+    core.startGroup('Templates')
     await renderTemplates('templates', tmpDir, {
       script: newScript,
       bun: enableBun,
       zx: enableZx,
     })
+    core.endGroup()
 
     await core.group('Content', async () => core.info(await fs.readFile(mainFile, 'utf-8')))
 
     // Run script
     if (enableBun) {
-      await execRun(`bun run -i ${mainFile}`, [], { silent })
+      const cmd = isBuildNode ? '/usr/local/bin/bun' : 'bun'
+      await execRun(`${cmd} run -i ${mainFile}`, [], { silent })
     }
     else {
       const tsxCli = path.join(moduleDir, 'tsx', 'dist', 'cli.mjs')

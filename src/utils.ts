@@ -57,7 +57,7 @@ export async function installBun(): Promise<void> {
     }
     else {
       // powershell -c "irm bun.sh/install.ps1|iex"
-      await execCommand('powershell -c "irm bun.sh/install.ps1|iex"')
+      await execCommand('powershell -c "irm bun.sh/install.ps1 | iex"')
     }
   }
   else {
@@ -112,7 +112,7 @@ export async function renderTemplates(
       const content = handlebars.compile(templateContent)(answers)
       // write to dest file
       await fs.writeFile(destPath, content, 'utf-8')
-      isDebug && core.info(`#RenderTemplates ${cyan(templatePath)} to ${cyan(destPath)}`)
+      core.info(`Render ${cyan(templatePath)} to ${cyan(destPath)}`)
     }
   }
 }
