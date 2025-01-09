@@ -1,6 +1,7 @@
 import type * as exec from '@actions/exec'
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import process from 'node:process'
 import * as core from '@actions/core'
 import { cyan, green, yellow } from 'kolorist'
 import { isAct } from './config.js'
@@ -95,7 +96,17 @@ async function run(): Promise<void> {
     }
     else {
       const tsxCli = path.join(moduleDir, 'tsx', 'dist', 'cli.mjs')
-      await execRun(`${tsxCli} ${mainFile}`, [], { silent })
+      const nodePath = process.execPath // 获取 node 可执行文件路径
+      const tsxExists = await fs.access(tsxCli)
+        .then(() => true)
+        .catch(() => false)
+
+      if (!tsxExists) {
+        core.setFailed(`tsx CLI not found at: ${tsxCli}`)
+        return
+      }
+
+      await execRun(nodePath, [tsxCli, mainFile], { silent })
     }
 
     core.setOutput('status', 'success')
