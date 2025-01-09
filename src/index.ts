@@ -38,6 +38,7 @@ async function run(): Promise<void> {
     const mainFile = path.join(tmpDir, 'src', 'index.ts')
     core.info(`Directory: ${cyan(tmpDir)}`)
 
+    const normalizePath = (p: string) => p.split(path.sep).join('/')
     const execRun = async (command: string, args?: string[], options?: exec.ExecOptions): Promise<any> => {
       return await execCommand(command, args, { cwd: tmpDir, ...options })
     }
@@ -53,7 +54,9 @@ async function run(): Promise<void> {
       // Handle external packages
       await fs.mkdir(moduleDir, { recursive: true })
       core.info('Extracting tarball to node_modules')
-      const resultTar = await execCommand(`tar -zxvf ./public/tsx.tar.gz -C ${moduleDir}`, [], { silent: true })
+      const gzFile = normalizePath(path.join('./public', 'tsx.tar.gz'))
+      const targetDir = normalizePath(moduleDir)
+      const resultTar = await execCommand(`tar -zxvf ${gzFile} -C ${targetDir}`, [], { silent: true })
       !isAct && await core.group('Extract Details', async () => core.info(resultTar))
 
       const pkgFile = path.join(moduleDir, 'package.json')

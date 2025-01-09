@@ -12,6 +12,7 @@ export default antfu(
   {
     rules: {
       'antfu/no-top-level-await': 'off',
+      'ts/explicit-function-return-type': 'off',
     },
   },
 )
