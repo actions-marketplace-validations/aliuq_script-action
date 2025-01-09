@@ -4,7 +4,7 @@ import path from 'node:path'
 import process from 'node:process'
 import * as core from '@actions/core'
 import { cyan, green, yellow } from 'kolorist'
-import { execCommand, installBun, renderTemplates, tmpdir } from './utils.js'
+import { execCommand, exist, installBun, renderTemplates, tmpdir } from './utils.js'
 
 async function run(): Promise<void> {
   try {
@@ -47,8 +47,7 @@ async function run(): Promise<void> {
     if (enableBun && autoInstall) {
       core.info('auto_install is enabled, deleting node_modules directory')
       // Only deleting the `node_modules` directory can ensure triggering bun's automatic installation
-      const existModuleDir = await fs.access(moduleDir).then(() => true).catch(() => false)
-      existModuleDir && await fs.rm(moduleDir, { recursive: true })
+      await fs.rm(moduleDir, { recursive: true })
     }
     else {
       // Handle external packages
@@ -100,11 +99,8 @@ async function run(): Promise<void> {
     else {
       const tsxCli = path.join(moduleDir, 'tsx', 'dist', 'cli.mjs')
       const nodePath = process.execPath // 获取 node 可执行文件路径
-      const tsxExists = await fs.access(tsxCli)
-        .then(() => true)
-        .catch(() => false)
 
-      if (!tsxExists) {
+      if (!(await exist(tsxCli))) {
         core.setFailed(`tsx CLI not found at: ${tsxCli}`)
         return
       }

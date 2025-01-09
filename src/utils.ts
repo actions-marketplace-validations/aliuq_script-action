@@ -1,4 +1,5 @@
 import type { Buffer } from 'node:buffer'
+import type { PathLike } from 'node:fs'
 import fs from 'node:fs/promises'
 import { homedir, tmpdir as osTmpdir } from 'node:os'
 import path from 'node:path'
@@ -56,20 +57,20 @@ export async function installBun(): Promise<string> {
 
   core.info(`Set Bun install directory: ${cyan(bunFile)}`)
 
-  const existFile = await fs.access(fileName).then(() => true).catch(() => false)
-  if (!existFile) {
-    core.info(`Install from shell script <https://bun.sh/install>`)
+  if (!(await exist(fileName))) {
     if (!isWin) {
+      core.info(`Install from shell script <https://bun.sh/install>`)
       await execCommand('curl -fsSL https://bun.sh/install -o /tmp/bun-install.sh')
       await execCommand('bash /tmp/bun-install.sh')
     }
     else {
-      // powershell -c "irm bun.sh/install.ps1|iex"
+      core.info(`Install from shell script <https://bun.sh/install.ps1>`)
       await execCommand('powershell -c "irm bun.sh/install.ps1 | iex"')
     }
   }
   else {
     core.info(`Install from local file ${cyan(fileName)}`)
+    await fs.mkdir(binDir, { recursive: true })
     await execCommand(`unzip -o -j ${fileName} -d ${binDir}`)
   }
 
@@ -131,4 +132,13 @@ export async function tmpdir(dir: string = ''): Promise<string> {
   const tmpRandomDir = path.join(osTmpdir(), `ts-${random}`, dir)
   await fs.mkdir(tmpRandomDir, { recursive: true })
   return tmpRandomDir
+}
+
+/**
+ * Check if the directory exists
+ */
+export async function exist(dir: PathLike, mode?: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    fs.access(dir, mode).then(() => resolve(true)).catch(() => resolve(false))
+  })
 }
