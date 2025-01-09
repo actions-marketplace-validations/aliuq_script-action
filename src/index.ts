@@ -4,7 +4,6 @@ import path from 'node:path'
 import process from 'node:process'
 import * as core from '@actions/core'
 import { cyan, green, yellow } from 'kolorist'
-import { isAct } from './config.js'
 import { execCommand, installBun, renderTemplates, tmpdir } from './utils.js'
 
 async function run(): Promise<void> {
@@ -39,7 +38,7 @@ async function run(): Promise<void> {
     const mainFile = path.join(tmpDir, 'src', 'index.ts')
     core.info(`Directory: ${cyan(tmpDir)}`)
 
-    const normalizePath = (p: string) => p.split(path.sep).join('/')
+    // const normalizePath = (p: string) => p.split(path.sep).join('/')
     const execRun = async (command: string, args?: string[], options?: exec.ExecOptions): Promise<any> => {
       return await execCommand(command, args, { cwd: tmpDir, ...options })
     }
@@ -53,20 +52,24 @@ async function run(): Promise<void> {
     }
     else {
       // Handle external packages
-      await fs.mkdir(moduleDir, { recursive: true })
-      core.info('Extracting tarball to node_modules')
-      const gzFile = normalizePath(path.join('./public', 'tsx.tar.gz'))
-      const targetDir = normalizePath(moduleDir)
-      const resultTar = await execCommand(`tar -zxvf ${gzFile} -C ${targetDir}`, [], { silent: true })
-      !isAct && await core.group('Extract Details', async () => core.info(resultTar))
+      // await fs.mkdir(moduleDir, { recursive: true })
+      // core.info('Extracting tarball to node_modules')
+      // const gzFile = normalizePath(path.join('./public', 'tsx.tar.gz'))
+      // const targetDir = normalizePath(moduleDir)
+      // const resultTar = await execCommand(`tar -zxvf ${gzFile} -C ${targetDir}`, [], { silent: true })
+      // !isAct && await core.group('Extract Details', async () => core.info(resultTar))
 
-      const pkgFile = path.join(moduleDir, 'package.json')
-      const pkgLockFile = path.join(moduleDir, 'package-lock.json')
-      await execCommand(`mv ${pkgFile} ${pkgLockFile} ${tmpDir}`, [], { silent: true })
+      // const pkgFile = path.join(moduleDir, 'package.json')
+      // const pkgLockFile = path.join(moduleDir, 'package-lock.json')
+      // await execCommand(`mv ${pkgFile} ${pkgLockFile} ${tmpDir}`, [], { silent: true })
 
       // Handle packages
       // e.g. packages: zod, axios, typescript zx
-      const newPackages = packages?.length === 1 ? packages[0].split(/[,\s]+/g) : packages
+      const defaultPackages = ['tsx', '@actions/core', '@actions/exec', 'zx']
+      const newPackages = [
+        ...(packages?.length === 1 ? packages[0].split(/[,\s]+/g) : packages),
+        ...defaultPackages,
+      ]
       if (newPackages?.length) {
         const installer = enableBun ? bunFile : 'npm'
         core.info(`Use ${yellow(installer)} to install packages ${yellow(newPackages.join(', '))}`)
