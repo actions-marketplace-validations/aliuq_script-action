@@ -136,6 +136,11 @@ export async function tmpdir(dir: string = ''): Promise<string> {
 
 /**
  * Check if the directory exists
+ *
+ * e.g. true || 'is True' ==> true
+ * e.g. false || 'is False' ==> 'is False'
+ * e.g. true && 'is True' ==> 'is True'
+ * e.g. false && 'is False' ==> false
  */
 export async function exist(dir: PathLike, mode?: number): Promise<boolean> {
   return new Promise((resolve) => {

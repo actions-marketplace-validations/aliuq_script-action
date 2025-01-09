@@ -47,7 +47,7 @@ async function run(): Promise<void> {
     if (enableBun && autoInstall) {
       core.info('auto_install is enabled, deleting node_modules directory')
       // Only deleting the `node_modules` directory can ensure triggering bun's automatic installation
-      await fs.rm(moduleDir, { recursive: true })
+      await exist(moduleDir) && await fs.rm(moduleDir, { recursive: true })
     }
     else {
       // Handle external packages
