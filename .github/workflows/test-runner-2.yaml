@@ -27,7 +27,8 @@ jobs:
       fail-fast: false
       matrix:
         # os: [ubuntu-latest]
-        os: ['${{ inputs.os }}']
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        # os: ['${{ inputs.os }}']
         bun: [true, false]
     steps:
       - uses: actions/checkout@v4
@@ -79,8 +80,8 @@ jobs:
       fail-fast: false
       matrix:
         # os: [ubuntu-latest]
-        # os: [ubuntu-latest, windows-latest, macos-latest]
-        os: ['${{ inputs.os }}']
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        # os: ['${{ inputs.os }}']
     steps:
       - uses: actions/checkout@v4
 
