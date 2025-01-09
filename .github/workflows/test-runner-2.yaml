@@ -20,7 +20,7 @@ on:
 
 jobs:
   test-node:
-    name: test-node:${{ matrix.os }}:${{ matrix.bun && 'bun' || 'tsx' }}
+    name: test-node | ${{ matrix.os }} | ${{ matrix.bun && 'bun' || 'tsx' }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     strategy:
@@ -73,7 +73,7 @@ jobs:
             console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
 
   test-bun:
-    name: test-bun:${{ matrix.os }}
+    name: test-bun | ${{ matrix.os }} | bun
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     strategy:
