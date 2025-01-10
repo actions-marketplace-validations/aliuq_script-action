@@ -1,7 +1,6 @@
 import type * as exec from '@actions/exec'
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import process from 'node:process'
 import * as core from '@actions/core'
 import { cyan, green, yellow } from 'kolorist'
 import { execCommand, exist, installBun, renderTemplates, tmpdir } from './utils.js'
@@ -86,15 +85,7 @@ async function run(): Promise<void> {
       await execRun(`${bunFile} run -i ${mainFile}`, [], { silent })
     }
     else {
-      const tsxCli = path.join(moduleDir, 'tsx', 'dist', 'cli.mjs')
-      const nodePath = process.execPath // 获取 node 可执行文件路径
-
-      if (!(await exist(tsxCli))) {
-        core.setFailed(`tsx CLI not found at: ${tsxCli}`)
-        return
-      }
-
-      await execRun(nodePath, [tsxCli, mainFile], { silent })
+      await execRun('tsx', [mainFile], { silent })
     }
 
     core.setOutput('status', 'success')

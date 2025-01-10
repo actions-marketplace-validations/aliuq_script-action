@@ -1,7 +1,7 @@
 import type { Buffer } from 'node:buffer'
 import type { PathLike } from 'node:fs'
 import fs from 'node:fs/promises'
-import { homedir, tmpdir as osTmpdir } from 'node:os'
+import { homedir } from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import * as core from '@actions/core'
@@ -120,7 +120,7 @@ export async function renderTemplates(
 
 export async function tmpdir(dir: string = ''): Promise<string> {
   const random = Math.random().toString(36).substring(2, 15)
-  const tmpRandomDir = path.join(osTmpdir(), `ts-${random}`, dir)
+  const tmpRandomDir = path.join(homedir(), `ts-${random}`, dir)
   await fs.mkdir(tmpRandomDir, { recursive: true })
   return tmpRandomDir
 }
