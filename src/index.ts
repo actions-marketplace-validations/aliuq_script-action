@@ -50,21 +50,10 @@ async function run(): Promise<void> {
       await exist(moduleDir) && await fs.rm(moduleDir, { recursive: true })
     }
     else {
-      // Handle external packages
-      // await fs.mkdir(moduleDir, { recursive: true })
-      // core.info('Extracting tarball to node_modules')
-      // const gzFile = normalizePath(path.join('./public', 'tsx.tar.gz'))
-      // const targetDir = normalizePath(moduleDir)
-      // const resultTar = await execCommand(`tar -zxvf ${gzFile} -C ${targetDir}`, [], { silent: true })
-      // !isAct && await core.group('Extract Details', async () => core.info(resultTar))
-
-      // const pkgFile = path.join(moduleDir, 'package.json')
-      // const pkgLockFile = path.join(moduleDir, 'package-lock.json')
-      // await execCommand(`mv ${pkgFile} ${pkgLockFile} ${tmpDir}`, [], { silent: true })
-
       // Handle packages
       // e.g. packages: zod, axios, typescript zx
-      const defaultPackages = ['tsx', '@actions/core', '@actions/exec', 'zx']
+      const defaultPackages = ['@actions/core', '@actions/exec']
+      !enableBun && defaultPackages.push('tsx', 'zx')
       const newPackages = [
         ...(packages?.length === 1 ? packages[0].split(/[,\s]+/g) : packages),
         ...defaultPackages,

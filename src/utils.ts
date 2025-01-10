@@ -47,8 +47,6 @@ export async function installBun(): Promise<string> {
   const isWin = os === 'win32'
   core.info(`System: ${cyan(os)} ${cyan(arch)}`)
 
-  const fileName = `./public/bun-${os}-${arch}.zip`
-
   // According to the official website, the installation directory is `~/.bun`
   // ~/.bun/bin/bun or C:\Users\runneradmin\.bun\bin\bun.exe
   const installDir = path.join(process.env.BUN_INSTALL || homedir(), '.bun')
@@ -57,21 +55,14 @@ export async function installBun(): Promise<string> {
 
   core.info(`Set Bun install directory: ${cyan(bunFile)}`)
 
-  if (!(await exist(fileName))) {
-    if (!isWin) {
-      core.info(`Install from shell script <https://bun.sh/install>`)
-      await execCommand('curl -fsSL https://bun.sh/install -o /tmp/bun-install.sh')
-      await execCommand('bash /tmp/bun-install.sh')
-    }
-    else {
-      core.info(`Install from shell script <https://bun.sh/install.ps1>`)
-      await execCommand('powershell -c "irm bun.sh/install.ps1 | iex"')
-    }
+  if (!isWin) {
+    core.info(`Install from shell script <https://bun.sh/install>`)
+    await execCommand('curl -fsSL https://bun.sh/install -o /tmp/bun-install.sh')
+    await execCommand('bash /tmp/bun-install.sh')
   }
   else {
-    core.info(`Install from local file ${cyan(fileName)}`)
-    await fs.mkdir(binDir, { recursive: true })
-    await execCommand(`unzip -o -j ${fileName} -d ${binDir}`)
+    core.info(`Install from shell script <https://bun.sh/install.ps1>`)
+    await execCommand('powershell -c "irm bun.sh/install.ps1 | iex"')
   }
 
   const version = await exec.getExecOutput(`${bunFile} --version`, [], { silent: true })
