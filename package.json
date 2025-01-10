@@ -21,7 +21,7 @@
     "dev": "act -W .github/workflows/ci.yaml -p=false workflow_dispatch",
     "build": "sh scripts/build.sh",
     "lint": "eslint .",
-    "release": "pnpm build && npx bumpp --push --tag --commit --all && npx changelogithub"
+    "release": "bun run build && bunx bumpp --push --tag --commit --all && bunx changelogithub"
   },
   "devDependencies": {
     "@actions/core": "^1.11.1",
