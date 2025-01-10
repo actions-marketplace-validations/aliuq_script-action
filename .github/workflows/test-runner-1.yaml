@@ -5,13 +5,7 @@ on:
 
 jobs:
   test-1:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        # bun: [true, false]
-        # packages: ['', dayjs]
-        # auto_install: [false, true]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -111,6 +105,7 @@ jobs:
           script: |
             import dayjs from 'dayjs'
             console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+
   demo:
     runs-on: ubuntu-latest
     steps:

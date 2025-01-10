@@ -9,15 +9,16 @@
   "keywords": [
     "github",
     "action",
-    "telegram",
-    "notification"
+    "typescript",
+    "bun",
+    "tsx"
   ],
   "main": "dist/index.js",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "dev": "act -W .github/workflows/test-runner-1.yaml -p=false workflow_dispatch",
+    "dev": "act -W .github/workflows/ci.yaml -p=false workflow_dispatch",
     "build": "sh scripts/build.sh",
     "lint": "eslint .",
     "release": "pnpm build && npx bumpp --push --tag --commit --all && npx changelogithub"
