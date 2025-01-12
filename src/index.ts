@@ -77,8 +77,8 @@ async function run(): Promise<void> {
 
     await core.group('Input Script', async () => core.info(newScript))
 
-    core.startGroup('Templates')
     const tplPath = await writeTemplates()
+    core.startGroup('Templates')
     await renderTemplates(tplPath, tmpDir, { script: newScript, bun: enableBun, zx: enableZx })
     core.endGroup()
 

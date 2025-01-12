@@ -125,7 +125,6 @@ export async function renderTemplates(
  * @returns directory path
  */
 export async function writeTemplates(): Promise<string> {
-  core.info('Write templates')
   const tplDir = await tmpdir('templates')
   const srcDir = path.join(tplDir, 'src')
   await fs.mkdir(srcDir, { recursive: true })
