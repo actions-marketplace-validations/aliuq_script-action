@@ -47,7 +47,7 @@ async function run(): Promise<void> {
 
     // Handle auto install
     if (enableBun && autoInstall) {
-      core.info(yellow('auto_install is enabled, deleting node_modules directory'))
+      core.info(yellow(`auto_install is enabled, deleting node_modules(${moduleDir}) directory`))
       // Only deleting the `node_modules` directory can ensure triggering bun's automatic installation
       await exist(moduleDir) && await fs.rm(moduleDir, { recursive: true })
     }
@@ -85,9 +85,13 @@ async function run(): Promise<void> {
 
     await core.group('Output Script', async () => core.info(await fs.readFile(mainFile, 'utf-8')))
 
+    // Print the important message
+    core.info(yellow(`CWD: ${cyan(tmpDir)}`))
+    core.info(yellow(`Project Dir: ${cyan(process.cwd())}`))
+
     // Run script
     if (enableBun) {
-      await execCommand(`${bunFile} run -i  ${mainFile}`, [], { silent: false })
+      await execRun(`${bunFile} run -i  ${mainFile}`, [], { silent: false })
     }
     else {
       const tsxCli = path.join(moduleDir, 'tsx', 'dist', 'cli.mjs')
@@ -97,7 +101,7 @@ async function run(): Promise<void> {
         core.setFailed(`tsx CLI not found at: ${tsxCli}`)
         return
       }
-      await execCommand(nodePath, [tsxCli, mainFile], { silent: false })
+      await execRun(nodePath, [tsxCli, mainFile], { silent: false })
     }
 
     core.setOutput('status', 'success')
