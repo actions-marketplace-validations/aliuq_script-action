@@ -64,7 +64,7 @@ async function run(): Promise<void> {
         const installer = enableBun ? bunFile : 'npm'
         logDebug(`Use ${cyan(installer)} to install packages ${cyan(newPackages.join(', '))}`)
         const execResult = await execRun(installer, ['install', ...newPackages], { silent: true })
-        await core.group('Install Packages', async () => core.info(execResult))
+        isDebug && await core.group('Install Packages', async () => core.info(execResult))
       }
       else {
         logDebug(yellow('No packages need to install'))
@@ -84,7 +84,6 @@ async function run(): Promise<void> {
     isDebug && core.endGroup()
 
     await core.group('Output Script', async () => core.info(await fs.readFile(mainFile, 'utf-8')))
-    core.info('Run script...\n\n')
 
     // Run script
     if (enableBun) {
