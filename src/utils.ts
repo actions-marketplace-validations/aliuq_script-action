@@ -40,6 +40,7 @@ export function createLogger(ns: string) {
  * OS: win32 | linux | darwin
  */
 export async function installBun(): Promise<string> {
+  core.startGroup('Install Bun')
   const startTime = performance.now()
   // win32 | linux | darwin
   const os = process.platform.toLowerCase()
@@ -68,6 +69,7 @@ export async function installBun(): Promise<string> {
   const version = await exec.getExecOutput(`${bunFile} --version`, [], { silent: true })
   core.info(`Bun version: ${cyan(version.stdout.trim())}`)
   core.info(`Spend Time: ${cyan(performance.now() - startTime)}ms`)
+  core.endGroup()
 
   return bunFile
 }

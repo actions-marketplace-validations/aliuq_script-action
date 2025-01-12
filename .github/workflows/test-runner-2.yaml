@@ -91,30 +91,43 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: ZX Command Execution Test
+      - name: ZX Command Execution Test - bun
         uses: ./
         with:
-          bun: ${{ matrix.mode == 'bun' }}
-          zx: true
+          bun: true
           script: |
             // Execute system commands - using platform agnostic commands
             await $`echo "Current directory:"`
-            if (process.platform === 'win32') {
-              await $`cd`
-            } else {
-              await $`pwd`
-            }
+            await $`pwd`
 
             // Use glob with error handling
             try {
-              if (${{ matrix.mode == 'bun' }}) {
-                const glob = new Bun.Glob('src/*.ts')
-                const tsFiles = await glob.scan('.')
-                console.log('TypeScript files:', tsFiles)
-              } else {
-                const tsFiles = await glob('src/*.ts')
-                console.log('TypeScript files:', tsFiles)
-              }
+              const glob = new Bun.Glob()
+              const tsFiles = await glob.scan('src/*.ts')
+              console.log('TypeScript files:', tsFiles)
+            } catch (error) {
+              console.warn('Glob operation failed:', error)
+            }
+
+            // Use fetch (cross-platform compatible)
+            const response = await fetch('https://api.github.com/zen')
+            console.log('GitHub Zen:', await response.text())
+
+      - name: ZX Command Execution Test - tsx
+        uses: ./
+        with:
+          bun: false
+          zx: true
+          script: |
+            // Execute system commands - using platform agnostic commands
+            echo('Current directory:')
+            const res1 = await $`pwd`.text()
+            echo(res1)
+
+            // Use glob with error handling
+            try {
+              const tsFiles = await glob('src/*.ts')
+              console.log('TypeScript files:', tsFiles)
             } catch (error) {
               console.warn('Glob operation failed:', error)
             }

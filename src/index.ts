@@ -16,18 +16,17 @@ async function run(): Promise<void> {
     const script = core.getInput('script', { required: true })
     const packages = core.getMultilineInput('packages', { required: false }) || ''
     const autoInstall = core.getInput('auto_install', { required: false }) === 'true'
-    const silent = core.getInput('silent', { required: false }) === 'true'
+    // const silent = core.getInput('silent', { required: false }) === 'true'
 
     const enableBun = isBuildNode ? core.getInput('bun', { required: false }) === 'true' : true
     const enableZx = isBuildNode ? core.getInput('zx', { required: false }) === 'true' : false
 
-    core.info(`Mode: ${isBuildNode ? green('node') : green('bun')}`)
+    core.info(`Mode(node/bun): ${isBuildNode ? green('node') : green('bun')}`)
     let bunFile: string = 'bun'
 
     if (enableBun) {
-      core.info(`Runner: ${green('bun')}`)
       isBuildNode && (bunFile = await installBun())
-      core.info(`Bun: ${cyan(bunFile)}`)
+      core.info(`Runner: ${green('bun')} with bin ${cyan(bunFile)}`)
       // Set environment variable for bun, process.env.BUN is true
       process.env.BUN = 'true'
     }
@@ -47,7 +46,7 @@ async function run(): Promise<void> {
 
     // Handle auto install
     if (enableBun && autoInstall) {
-      core.info('auto_install is enabled, deleting node_modules directory')
+      core.info(yellow('auto_install is enabled, deleting node_modules directory'))
       // Only deleting the `node_modules` directory can ensure triggering bun's automatic installation
       await exist(moduleDir) && await fs.rm(moduleDir, { recursive: true })
     }
@@ -62,8 +61,9 @@ async function run(): Promise<void> {
       ]
       if (newPackages?.length) {
         const installer = enableBun ? bunFile : 'npm'
-        core.info(`Use ${yellow(installer)} to install packages ${yellow(newPackages.join(', '))}`)
-        await execRun(installer, ['install', ...newPackages], { silent })
+        core.info(`Use ${cyan(installer)} to install packages ${cyan(newPackages.join(', '))}`)
+        const execResult = await execRun(installer, ['install', ...newPackages], { silent: true })
+        await core.group('Install Packages', async () => core.info(execResult))
       }
       else {
         core.info(yellow('No packages need to install'))
@@ -74,7 +74,7 @@ async function run(): Promise<void> {
     const newScript = script
       // Replace ^# to //
       .replace(/^#/gm, '//')
-    await core.group('Script', async () => core.info(newScript))
+    await core.group('Input Script', async () => core.info(newScript))
     core.startGroup('Templates')
     await renderTemplates('templates', tmpDir, {
       script: newScript,
@@ -83,11 +83,15 @@ async function run(): Promise<void> {
     })
     core.endGroup()
 
-    await core.group('Content', async () => core.info(await fs.readFile(mainFile, 'utf-8')))
+    await core.group('Output Content', async () => core.info(await fs.readFile(mainFile, 'utf-8')))
 
     // Run script
+    const args = []
+    let execEntry = ''
     if (enableBun) {
-      await execRun(`${bunFile} run -i ${mainFile}`, [], { silent })
+      execEntry = bunFile
+      args.push('run', '-i', mainFile)
+      // await execRun(`${bunFile} run -i ${mainFile}`, [], { silent })
     }
     else {
       const tsxCli = path.join(moduleDir, 'tsx', 'dist', 'cli.mjs')
@@ -98,8 +102,13 @@ async function run(): Promise<void> {
         return
       }
 
-      await execRun(nodePath, [tsxCli, mainFile], { silent })
+      execEntry = nodePath
+      args.push(tsxCli, mainFile)
+      // await execRun(nodePath, [tsxCli, mainFile], { silent })
     }
+
+    const execResult = await execRun(execEntry, args, { silent: true })
+    await core.group('Run Script', async () => core.info(execResult))
 
     core.setOutput('status', 'success')
   }
