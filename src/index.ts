@@ -4,7 +4,7 @@ import path from 'node:path'
 import process from 'node:process'
 import * as core from '@actions/core'
 import { cyan, green, yellow } from 'kolorist'
-import { execCommand, exist, installBun, renderTemplates, tmpdir } from './utils.js'
+import { execCommand, exist, installBun, renderTemplates, tmpdir, writeTemplates } from './utils.js'
 
 async function run(): Promise<void> {
   try {
@@ -78,15 +78,8 @@ async function run(): Promise<void> {
     await core.group('Input Script', async () => core.info(newScript))
 
     core.startGroup('Templates')
-    const lsRes = await execCommand('ls', ['-a', '.'])
-    core.info(`PWD list: ${lsRes}`)
-    const tplDir = path.join(process.cwd(), 'templates')
-    core.info(`Template directory: ${cyan(tplDir)}`)
-    await renderTemplates(tplDir, tmpDir, {
-      script: newScript,
-      bun: enableBun,
-      zx: enableZx,
-    })
+    const tplPath = await writeTemplates()
+    await renderTemplates(tplPath, tmpDir, { script: newScript, bun: enableBun, zx: enableZx })
     core.endGroup()
 
     await core.group('Output Content', async () => core.info(await fs.readFile(mainFile, 'utf-8')))

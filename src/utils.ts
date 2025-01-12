@@ -1,5 +1,5 @@
-import type { Buffer } from 'node:buffer'
 import type { PathLike } from 'node:fs'
+import { Buffer } from 'node:buffer'
 import fs from 'node:fs/promises'
 import { homedir } from 'node:os'
 import path from 'node:path'
@@ -85,13 +85,13 @@ export async function renderTemplates(
   destRoot: string,
   answers: Record<string, any>,
 ): Promise<void> {
-  const existTplRoot = await fs.access(templateRoot).then(() => true).catch(() => false)
+  const existTplRoot = await exist(templateRoot)
   if (!existTplRoot) {
     core.setFailed(`Template directory ${templateRoot} not found`)
     return
   }
 
-  const existDestRoot = await fs.access(destRoot).then(() => true).catch(() => false)
+  const existDestRoot = await exist(destRoot)
   if (!existDestRoot) {
     await fs.mkdir(destRoot, { recursive: true })
   }
@@ -120,7 +120,47 @@ export async function renderTemplates(
   }
 }
 
-export async function tmpdir(dir: string = ''): Promise<string> {
+/**
+ * Write templates to a temporary directory
+ * @returns directory path
+ */
+export async function writeTemplates(): Promise<string> {
+  core.info('Write templates')
+  const tplDir = await tmpdir('templates')
+  const srcDir = path.join(tplDir, 'src')
+  await fs.mkdir(srcDir, { recursive: true })
+
+  const revertFile = (str: string) => Buffer.from(str, 'base64').toString('utf-8')
+  // @ts-expect-error TPL_PACKAGE_JSON is a string
+  await fs.writeFile(path.join(tplDir, 'package.json'), revertFile(TPL_PACKAGE_JSON), 'utf-8')
+  // @ts-expect-error TPL_TSCONFIG_JSON is a string
+  await fs.writeFile(path.join(tplDir, 'tsconfig.json'), revertFile(TPL_TSCONFIG_JSON), 'utf-8')
+  // @ts-expect-error TPL_SRC_CONFIG_TS is a string
+  await fs.writeFile(path.join(srcDir, 'config.ts'), revertFile(TPL_SRC_CONFIG_TS), 'utf-8')
+  // @ts-expect-error TPL_SRC_UTILS_TS is a string
+  await fs.writeFile(path.join(srcDir, 'utils.ts'), revertFile(TPL_SRC_UTILS_TS), 'utf-8')
+  // @ts-expect-error TPL_SRC_INDEX_TS is a string
+  await fs.writeFile(path.join(srcDir, 'index.ts'), revertFile(TPL_SRC_INDEX_TS), 'utf-8')
+
+  // 查看模板文件
+  await core.group('Template Files', async () => {
+    const files = await fs.readdir(tplDir, { recursive: true })
+    for await (const file of files) {
+      const tempFile = path.join(tplDir, file)
+      const isDir = (await fs.stat(tempFile)).isDirectory()
+      if (!isDir) {
+        const content = await fs.readFile(tempFile, 'utf-8')
+        core.info(`Template file: ${cyan(file)}`)
+        core.info(content)
+        core.info('')
+      }
+    }
+  })
+
+  return tplDir
+}
+
+export async function tmpdir(dir = ''): Promise<string> {
   const random = Math.random().toString(36).substring(2, 15)
   const tmpRandomDir = path.join(homedir(), `ts-${random}`, dir)
   await fs.mkdir(tmpRandomDir, { recursive: true })
