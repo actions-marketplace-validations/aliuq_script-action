@@ -1,7 +1,7 @@
 {
   "name": "script-action",
   "type": "module",
-  "version": "1.0.3",
+  "version": "1.0.4-beta.1",
   "packageManager": "pnpm@9.12.3",
   "description": "GitHub Action for executing TypeScript/JavaScript scripts in workflows",
   "author": "AliuQ",
