@@ -76,7 +76,9 @@ async function run(): Promise<void> {
       .replace(/^#/gm, '//')
     await core.group('Input Script', async () => core.info(newScript))
     core.startGroup('Templates')
-    await renderTemplates('templates', tmpDir, {
+    const tplDir = path.join(__dirname, '..', 'templates')
+    core.info(`Template directory: ${cyan(tplDir)}`)
+    await renderTemplates(tplDir, tmpDir, {
       script: newScript,
       bun: enableBun,
       zx: enableZx,
