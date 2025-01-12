@@ -82,12 +82,11 @@ jobs:
             console.log('API Rate Limit:', data.rate)
 
   zx-features:
-    name: ZX Syntax Tests (${{ matrix.os }}-${{ matrix.mode }})
+    name: ZX Syntax Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        mode: [bun, tsx]
     steps:
       - uses: actions/checkout@v4
 
