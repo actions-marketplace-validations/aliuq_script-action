@@ -101,8 +101,8 @@ jobs:
 
             // Use glob with error handling
             try {
-              const glob = new Bun.Glob()
-              const tsFiles = await glob.scan('src/*.ts')
+              const glob = new Bun.Glob('src/*.ts')
+              const tsFiles = Array.from(glob.scanSync('.'))
               console.log('TypeScript files:', tsFiles)
             } catch (error) {
               console.warn('Glob operation failed:', error)
