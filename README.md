@@ -75,7 +75,6 @@ A powerful GitHub Action for executing TypeScript/JavaScript scripts in workflow
 | `bun` | Use Bun runtime | No | "true" |
 | `auto_install` | Auto install dependencies (Bun mode only) | No | "false" |
 | `zx` | Enable Google/ZX syntax (non-Bun mode only) | No | "true" |
-| `silent` | Run script in silent mode | No | "false" |
 | `debug` | Enable debug logging | No | "false" |
 
 ## Runtime Environment

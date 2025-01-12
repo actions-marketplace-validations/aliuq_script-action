@@ -25,10 +25,6 @@ inputs:
     description: Support using google/zx library, only works when `bun` is `false`
     required: false
     default: 'true'
-  silent:
-    description: Silent mode for script
-    required: false
-    default: 'false'
 
 runs:
   using: node20

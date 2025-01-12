@@ -75,7 +75,6 @@
 | `bun` | 是否使用 bun 执行脚本 | 否 | "true" |
 | `auto_install` | 自动下载依赖包（仅在 bun 模式下有效） | 否 | "false" |
 | `zx` | 启用 google/zx 语法（仅在非 bun 模式下有效） | 否 | "true" |
-| `silent` | 是否静默执行脚本 | 否 | "false" |
 | `debug` | 是否打印调试日志 | 否 | "false" |
 
 ## 运行环境

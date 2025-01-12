@@ -17,10 +17,6 @@ inputs:
     description: Auto install packages, only works with `bun`, If set, `packages` will be ignored
     required: false
     default: 'false'
-  silent:
-    description: Silent mode for script
-    required: false
-    default: 'false'
 
   # https://github.com/oven-sh/setup-bun
   bun-version:
@@ -62,7 +58,6 @@ runs:
         INPUT_SCRIPT: ${{ inputs.script }}
         INPUT_PACKAGES: ${{ inputs.packages }}
         INPUT_AUTO_INSTALL: ${{ inputs.auto_install }}
-        INPUT_SILENT: ${{ inputs.silent }}
 
 branding:
   icon: code
