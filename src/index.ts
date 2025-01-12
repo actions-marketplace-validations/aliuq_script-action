@@ -28,6 +28,8 @@ async function run(): Promise<void> {
       core.info(`Runner: ${green('bun')}`)
       isBuildNode && (bunFile = await installBun())
       core.info(`Bun: ${cyan(bunFile)}`)
+      // Set environment variable for bun, process.env.BUN is true
+      process.env.BUN = 'true'
     }
     else {
       core.info(`Runner: ${green('tsx')}`)
@@ -70,6 +72,8 @@ async function run(): Promise<void> {
 
     // Handle script
     const newScript = script
+      // Replace ^# to //
+      .replace(/^#/gm, '//')
     await core.group('Script', async () => core.info(newScript))
     core.startGroup('Templates')
     await renderTemplates('templates', tmpDir, {

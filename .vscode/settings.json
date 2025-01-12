@@ -47,10 +47,6 @@
     "mdast",
     "zxvf"
   ],
-  "yaml.schemas": {
-    "file:///root/.vscode-server/extensions/docsmsft.docs-yaml-1.0.5/dist/toc.schema.json": "/toc\\.yml/i",
-    "https://json.schemastore.org/github-workflow.json": "file:///home/aliuq/apps/script-action/test/run.yaml"
-  },
   "files.associations": {
     "**/templates/**/*.ts": "html"
   }
