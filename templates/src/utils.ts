@@ -6,17 +6,32 @@ import { isDebug } from './config.js'
  * Execute a command and return the output
  */
 export async function execCommand(command: string, args?: string[], options?: exec.ExecOptions): Promise<string> {
-  let result = ''
-  await exec.exec(command, args, {
-    listeners: {
-      stdout: (data: Buffer) => {
-        result += data.toString()
+  let output = ''
+  let error = ''
+  const cmd = command + (args ? ` ${args.join(' ')}` : '')
+  try {
+    await exec.exec(command, args, {
+      listeners: {
+        stdout: (data: Buffer) => {
+          output += data.toString()
+        },
+        stderr: (data) => {
+          error += data.toString()
+        },
       },
-    },
-    silent: !isDebug,
-    ...options,
-  })
-  return result?.trim?.()
+      silent: !isDebug,
+      ...options,
+    })
+    return output?.trim?.()
+  }
+  catch (e: any) {
+    if (error) {
+      core.warning(error)
+    }
+    core.warning(e.message)
+    core.setFailed(`Failed to execute command: ${cmd}`)
+    return ''
+  }
 }
 
 /**

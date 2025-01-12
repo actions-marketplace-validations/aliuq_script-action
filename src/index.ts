@@ -87,7 +87,7 @@ async function run(): Promise<void> {
 
     // Run script
     if (enableBun) {
-      await execRun(`${bunFile} run -i ${mainFile}`, [], { silent: false })
+      await execCommand(`${bunFile} run -i  ${mainFile}`, [], { silent: false })
     }
     else {
       const tsxCli = path.join(moduleDir, 'tsx', 'dist', 'cli.mjs')
@@ -97,7 +97,7 @@ async function run(): Promise<void> {
         core.setFailed(`tsx CLI not found at: ${tsxCli}`)
         return
       }
-      await execRun(nodePath, [tsxCli, mainFile], { silent: false })
+      await execCommand(nodePath, [tsxCli, mainFile], { silent: false })
     }
 
     core.setOutput('status', 'success')
