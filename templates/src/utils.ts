@@ -36,3 +36,11 @@ export function createLogger(ns: string) {
 export function output(key: string, value: any) {
   core.setOutput(key, value)
 }
+
+/**
+ * Set the output value from an object
+ * @param obj 
+ */
+export function outputJson(obj: Record<string, any>) {
+  Object.entries(obj).forEach(([key, value]) => output(key, value))
+}
