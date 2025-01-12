@@ -4,64 +4,85 @@ on:
   workflow_dispatch:
     inputs:
       debug:
-        description: Debug mode
+        description: Enable debug mode
         type: boolean
         required: false
         default: false
 
 jobs:
-  test-node:
-    name: Action node - ${{ matrix.bun && 'bun' || 'tsx' }} | ${{ matrix.os }}
+  basic-tests:
+    name: Basic Functionality Tests (${{ matrix.os }}-${{ matrix.mode }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        bun: [true, false]
+        mode: [bun, tsx]
     steps:
       - uses: actions/checkout@v4
 
-      - name: basic
+      - name: Basic Output Test
         uses: ./
         with:
+          bun: ${{ matrix.mode == 'bun' }}
           debug: ${{ inputs.debug }}
-          bun: ${{ matrix.bun }}
           script: |
-            console.log('Test basic')
+            console.log('Hello from Script Action!')
+            if (${{ matrix.mode == 'bun' }}) {
+              console.log('UUID', Bun.randomUUIDv7())
+            }
+            console.log('Current mode:', process.env.BUN ? 'bun' : 'tsx')
 
-      - name: zx-like
+      - name: Environment Variable Test
+        uses: ./
+        env:
+          TEST_VAR: test-value
+        with:
+          bun: ${{ matrix.mode == 'bun' }}
+          script: |
+            console.log('Environment variable:', process.env.TEST_VAR)
+
+  package-management:
+    name: Package Management Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Manual Package Installation Test
         uses: ./
         with:
-          debug: ${{ inputs.debug }}
-          bun: ${{ matrix.bun }}
+          packages: axios dayjs
           script: |
-            const list = await $`ls -al .`.text()
-            console.log(list)
-
-            await $`echo "Hello World by bun"`
-
-      - name: packages
-        uses: ./
-        with:
-          debug: ${{ inputs.debug }}
-          bun: ${{ matrix.bun }}
-          packages: dayjs
-          script: |
+            import axios from 'axios'
             import dayjs from 'dayjs'
-            console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
 
-      - name: auto-install
-        if: ${{ matrix.bun }}
+            const date = dayjs().format('YYYY-MM-DD')
+            try {
+              const { data } = await axios.get('https://api.github.com/zen')
+              console.log(`${date}: ${ data }`)
+            } catch (error) {
+              if (axios.isAxiosError(error)) {
+                console.error('Error:', error.message, error.response?.data)
+              } else {
+                console.error('Unexpected error:', error)
+              }
+            }
+
+      - name: Automatic Package Installation Test
         uses: ./
         with:
-          debug: ${{ inputs.debug }}
           bun: true
           auto_install: true
           script: |
-            import dayjs from 'dayjs'
-            console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+            import { Octokit } from '@octokit/rest'
+            const octokit = new Octokit()
+            const { data } = await octokit.rest.rateLimit.get()
+            console.log('API Rate Limit:', data.rate)
 
-  test-bun:
-    name: Action bun - bun | ${{ matrix.os }}
+  zx-features:
+    name: ZX Syntax Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -69,37 +90,47 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: basic
-        uses: ./bun
+      - name: ZX Command Execution Test - bun
+        uses: ./
         with:
-          debug: ${{ inputs.debug }}
+          bun: true
           script: |
-            console.log('Test basic')
+            // Execute system commands - using platform agnostic commands
+            await $`echo "Current directory:"`
+            await $`pwd`
 
-      - name: zx-like
-        uses: ./bun
+            // Use glob with error handling
+            try {
+              const glob = new Bun.Glob('src/*.ts')
+              const tsFiles = Array.from(glob.scanSync('.'))
+              console.log('TypeScript files:', tsFiles)
+            } catch (error) {
+              console.warn('Glob operation failed:', error)
+            }
+
+            // Use fetch (cross-platform compatible)
+            const response = await fetch('https://api.github.com/zen')
+            console.log('GitHub Zen:', await response.text())
+
+      - name: ZX Command Execution Test - tsx
+        uses: ./
         with:
-          debug: ${{ inputs.debug }}
+          bun: false
+          zx: true
           script: |
-            const list = await $`ls -al .`.text()
-            console.log(list)
+            // Execute system commands - using platform agnostic commands
+            echo('Current directory:')
+            const res1 = await $`pwd`.text()
+            echo(res1)
 
-            await $`echo "Hello World by bun"`
+            // Use glob with error handling
+            try {
+              const tsFiles = await glob('src/*.ts')
+              console.log('TypeScript files:', tsFiles)
+            } catch (error) {
+              console.warn('Glob operation failed:', error)
+            }
 
-      - name: packages
-        uses: ./bun
-        with:
-          debug: ${{ inputs.debug }}
-          packages: dayjs
-          script: |
-            import dayjs from 'dayjs'
-            console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
-
-      - name: auto-install
-        uses: ./bun
-        with:
-          debug: ${{ inputs.debug }}
-          auto_install: true
-          script: |
-            import dayjs from 'dayjs'
-            console.log(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+            // Use fetch (cross-platform compatible)
+            const response = await fetch('https://api.github.com/zen')
+            console.log('GitHub Zen:', await response.text())

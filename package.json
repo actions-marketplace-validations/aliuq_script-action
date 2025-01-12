@@ -18,7 +18,6 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "act -W .github/workflows/ci.yaml -p=false workflow_dispatch",
     "build": "sh scripts/build.sh",
     "lint": "eslint .",
     "release": "bun run build && bunx bumpp --push --tag --commit --all && bunx changelogithub"
