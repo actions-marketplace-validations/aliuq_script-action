@@ -66,6 +66,19 @@ A powerful GitHub Action for executing TypeScript/JavaScript scripts in workflow
       console.log('TypeScript files:', files)
 ```
 
+### Output Variables
+
+Use the `output` function to set output variables:
+
+```yaml
+- name: Output variables
+  id: script
+  uses: aliuq/script-action@v1
+  with:
+    script: |
+      output('key', 'value')
+```
+
 ## Input Parameters
 
 | Parameter | Description | Required | Default |

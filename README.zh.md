@@ -66,6 +66,19 @@
       console.log('TypeScript files:', files)
 ```
 
+### 输出变量
+
+使用 `output` 函数输出变量：
+
+```yaml
+- name: Output variables
+  id: script
+  uses: aliuq/script-action@v1
+  with:
+    script: |
+      output('key', 'value')
+```
+
 ## 输入参数
 
 | 参数 | 描述 | 必填 | 默认值 |
