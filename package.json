@@ -21,7 +21,8 @@
     "dev": "bash scripts/build.sh watch",
     "build": "bash scripts/build.sh",
     "lint": "eslint .",
-    "release": "npm run build && npx bumpp --push --tag --commit --all && npx changelogithub"
+    "changelogithub": "npx changelogithub",
+    "release": "npm run build && npx bumpp --push --tag --commit --all"
   },
   "devDependencies": {
     "@actions/core": "^1.11.1",
