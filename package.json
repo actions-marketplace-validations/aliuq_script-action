@@ -22,7 +22,7 @@
     "build": "bash scripts/build.sh",
     "lint": "eslint .",
     "changelog": "bunx changelogithub",
-    "bumpp": "bunx bumpp --push --tag --commit --all",
+    "bumpp": "bunx bumpp@9.9.2 --push --tag --commit --all",
     "release": "bun run build && bun run bumpp && bun run changelog"
   },
   "devDependencies": {
