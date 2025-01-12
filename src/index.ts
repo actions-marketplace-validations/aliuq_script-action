@@ -74,9 +74,13 @@ async function run(): Promise<void> {
     const newScript = script
       // Replace ^# to //
       .replace(/^#/gm, '//')
+
     await core.group('Input Script', async () => core.info(newScript))
+
     core.startGroup('Templates')
-    const tplDir = path.join(process.cwd(), '..', 'templates')
+    const lsRes = await execCommand('ls', ['-a', '.'])
+    core.info(`PWD list: ${lsRes}`)
+    const tplDir = path.join(process.cwd(), 'templates')
     core.info(`Template directory: ${cyan(tplDir)}`)
     await renderTemplates(tplDir, tmpDir, {
       script: newScript,
