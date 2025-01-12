@@ -1,88 +1,94 @@
-# Telegram Message Notification Action
+# Script Action
 
-一个用于发送 Telegram 消息通知的 GitHub Action。支持基本消息发送和自定义按钮功能。
+A powerful GitHub Action for executing TypeScript/JavaScript scripts in workflows. Supports multiple runtimes (Bun/TSX), ESM modules, and ZX syntax.
 
-## 功能特点
+## ✨ Features
 
-- 发送基本文本消息
-- 支持 Markdown 格式
-- 支持自定义按钮
-- 支持话题回复
+- 🚀 Dual Runtime Support: Execute scripts using either Bun or TSX
+- 📦 Smart Package Management: Support for both manual specification and automatic dependency installation
+- 🔧 ESM Native Support: Full ES modules syntax compatibility
+- ⚡ ZX Integration: Google ZX syntax support in non-Bun mode
+- 🌈 Cross-platform: Windows, macOS and Linux support
 
-## 使用方法
+## 🚀 Quick Start
 
-### 基本配置
-
-1. 获取 Telegram Bot Token （从 [@BotFather](https://t.me/BotFather) 获取）
-2. 获取 Chat ID （可以使用 [@userinfobot](https://t.me/userinfobot) 获取）
-3. 在仓库的 Settings -> Secrets -> Actions 中添加以下 secrets：
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_CHAT_ID`
-   - `TELEGRAM_REPLY_TO_MESSAGE_ID`（可选，用于话题回复）
-
-### 基本用法
+### Basic Usage
 
 ```yaml
-- name: Send Telegram Message
-  uses: aliuq/telegram-action@main
+- name: Script Action
+  uses: aliuq/script-action@v1
   with:
-    bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-    message: |
-      🚀 新的提交已推送!
-
-      👤提交人: ${{ github.actor }}
-      📦仓库: ${{ github.repository }}
-      🌿分支: ${{ github.ref }}
+    script: |
+      console.log('This is a basic message')
 ```
 
-### 带按钮的消息
+### Bun Mode
 
 ```yaml
-- name: Send Message with Buttons
-  uses: aliuq/telegram-action@main
+- name: Run with Bun
+  uses: aliuq/script-action@v1
   with:
-    bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-    message: 查看更多信息
-    buttons: |
-      [
-        [
-          { "text": "查看提交", "url": "https://github.com/${{ github.repository }}/commit/${{ github.sha }}" }
-        ]
-      ]
+    bun: true
+    script: |
+      const response = await fetch('https://api.github.com')
+      console.log(await response.json())
 ```
 
-## 输入参数
+### Auto Install Dependencies
 
-| 参数 | 描述 | 必填 | 默认值 |
-|------|------|------|--------|
-| `bot_token` | Telegram Bot Token | 是 | - |
-| `chat_id` | Telegram Chat ID | 是 | - |
-| `message` | 要发送的消息内容 | 是 | "" |
-| `reply_to_message_id` | 要回复的消息 ID（用于话题功能） | 否 | "" |
-| `buttons` | 按钮配置的 JSON 字符串 | 否 | "" |
-| `disable_link_preview` | 禁用链接预览 | 否 | "true" |
+```yaml
+- name: Auto install dependencies
+  uses: aliuq/script-action@v1
+  with:
+    bun: true
+    auto_install: true
+    script: |
+      import { Octokit } from 'octokit'
+      const octokit = new Octokit()
+      const { data } = await octokit.rest.repos.get({
+        owner: 'aliuq',
+        repo: 'script-action'
+      })
+      console.log(data)
+```
 
-## 输出参数
+### Using ZX Syntax
 
-| 参数 | 描述 |
-|------|------|
-| `message_id` | 发送成功后的消息 ID |
+```yaml
+- name: Use ZX syntax
+  uses: aliuq/script-action@v1
+  with:
+    bun: false
+    zx: true
+    script: |
+      await $`ls -la`
+      const files = await glob('**/*.ts')
+      console.log('TypeScript files:', files)
+```
 
-## 完整示例
+## Input Parameters
 
-请参考 [.github/workflows/run.yaml](.github/workflows/run.yaml) 中的示例。
+| Parameter | Description | Required | Default |
+|-----------|-------------|:--------:|:-------:|
+| `script` | Script content to execute | Yes | - |
+| `packages` | Additional npm packages to install | No | - |
+| `bun` | Use Bun runtime | No | "true" |
+| `auto_install` | Auto install dependencies (Bun mode only) | No | "false" |
+| `zx` | Enable Google/ZX syntax (non-Bun mode only) | No | "true" |
+| `silent` | Run script in silent mode | No | "false" |
+| `debug` | Enable debug logging | No | "false" |
 
-## 许可证
+## Runtime Environment
+
+- Node.js: Using tsx + @actions/core + zx (when bun=false)
+- Bun: Using bun + @actions/core (when bun=true)
+
+## Complete Examples
+
+For more usage examples, please refer to [.github/workflows/ci.yaml](.github/workflows/ci.yaml).
+
+## License
 
 MIT License
 
-## 文档
-
-tsx + @actions/core + zx
-bun + @actions/core
-
-nodejs --- tsx + @actions/core + zx
-nodejs --- bun + @actions/core
-setup-bun --- bun + @actions/core
+[中文文档](README.zh.md)
