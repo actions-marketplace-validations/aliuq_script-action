@@ -4,7 +4,8 @@ import path from 'node:path'
 import process from 'node:process'
 import * as core from '@actions/core'
 import { cyan, green, yellow } from 'kolorist'
-import { execCommand, exist, installBun, renderTemplates, tmpdir, writeTemplates } from './utils.js'
+import { isDebug } from './config.js'
+import { execCommand, exist, installBun, logDebug, renderTemplates, tmpdir, writeTemplates } from './utils.js'
 
 async function run(): Promise<void> {
   try {
@@ -21,23 +22,23 @@ async function run(): Promise<void> {
     const enableBun = isBuildNode ? core.getInput('bun', { required: false }) === 'true' : true
     const enableZx = isBuildNode ? core.getInput('zx', { required: false }) === 'true' : false
 
-    core.info(`Mode(node/bun): ${isBuildNode ? green('node') : green('bun')}`)
+    logDebug(`Mode(node/bun): ${isBuildNode ? green('node') : green('bun')}`)
     let bunFile: string = 'bun'
 
     if (enableBun) {
       isBuildNode && (bunFile = await installBun())
-      core.info(`Runner: ${green('bun')} with bin ${cyan(bunFile)}`)
+      logDebug(`Runner: ${green('bun')} with bin ${cyan(bunFile)}`)
       // Set environment variable for bun, process.env.BUN is true
       process.env.BUN = 'true'
     }
     else {
-      core.info(`Runner: ${green('tsx')}`)
+      logDebug(`Runner: ${green('tsx')}`)
     }
 
     const tmpDir = await tmpdir()
     const moduleDir = path.join(tmpDir, 'node_modules')
     const mainFile = path.join(tmpDir, 'src', 'index.ts')
-    core.info(`Directory: ${cyan(tmpDir)}`)
+    logDebug(`Directory: ${cyan(tmpDir)}`)
 
     // const normalizePath = (p: string) => p.split(path.sep).join('/')
     const execRun = async (command: string, args?: string[], options?: exec.ExecOptions): Promise<any> => {
@@ -61,12 +62,12 @@ async function run(): Promise<void> {
       ]
       if (newPackages?.length) {
         const installer = enableBun ? bunFile : 'npm'
-        core.info(`Use ${cyan(installer)} to install packages ${cyan(newPackages.join(', '))}`)
+        logDebug(`Use ${cyan(installer)} to install packages ${cyan(newPackages.join(', '))}`)
         const execResult = await execRun(installer, ['install', ...newPackages], { silent: true })
         await core.group('Install Packages', async () => core.info(execResult))
       }
       else {
-        core.info(yellow('No packages need to install'))
+        logDebug(yellow('No packages need to install'))
       }
     }
 
@@ -78,19 +79,16 @@ async function run(): Promise<void> {
     await core.group('Input Script', async () => core.info(newScript))
 
     const tplPath = await writeTemplates()
-    core.startGroup('Templates')
+    isDebug && core.startGroup('Templates')
     await renderTemplates(tplPath, tmpDir, { script: newScript, bun: enableBun, zx: enableZx })
-    core.endGroup()
+    isDebug && core.endGroup()
 
-    await core.group('Output Content', async () => core.info(await fs.readFile(mainFile, 'utf-8')))
+    await core.group('Output Script', async () => core.info(await fs.readFile(mainFile, 'utf-8')))
+    core.info('Run script...\n\n')
 
     // Run script
-    const args = []
-    let execEntry = ''
     if (enableBun) {
-      execEntry = bunFile
-      args.push('run', '-i', mainFile)
-      // await execRun(`${bunFile} run -i ${mainFile}`, [], { silent })
+      await execRun(`${bunFile} run -i ${mainFile}`)
     }
     else {
       const tsxCli = path.join(moduleDir, 'tsx', 'dist', 'cli.mjs')
@@ -100,14 +98,8 @@ async function run(): Promise<void> {
         core.setFailed(`tsx CLI not found at: ${tsxCli}`)
         return
       }
-
-      execEntry = nodePath
-      args.push(tsxCli, mainFile)
-      // await execRun(nodePath, [tsxCli, mainFile], { silent })
+      await execRun(nodePath, [tsxCli, mainFile])
     }
-
-    const execResult = await execRun(execEntry, args, { silent: true })
-    await core.group('Run Script', async () => core.info(execResult))
 
     core.setOutput('status', 'success')
   }

@@ -11,6 +11,13 @@ import { cyan } from 'kolorist'
 import { isDebug } from './config.js'
 
 /**
+ * Log debug message
+ */
+export function logDebug(msg: string): void {
+  isDebug && core.info(msg)
+}
+
+/**
  * Execute a command and return the output
  */
 export async function execCommand(command: string, args?: string[], options?: exec.ExecOptions): Promise<string> {
@@ -40,13 +47,13 @@ export function createLogger(ns: string) {
  * OS: win32 | linux | darwin
  */
 export async function installBun(): Promise<string> {
-  core.startGroup('Install Bun')
+  isDebug && core.startGroup('Install Bun')
   const startTime = performance.now()
   // win32 | linux | darwin
   const os = process.platform.toLowerCase()
   const arch = process.arch.toLowerCase()
   const isWin = os === 'win32'
-  core.info(`System: ${cyan(os)} ${cyan(arch)}`)
+  logDebug(`System: ${cyan(os)} ${cyan(arch)}`)
 
   // According to the official website, the installation directory is `~/.bun`
   // ~/.bun/bin/bun or C:\Users\runneradmin\.bun\bin\bun.exe
@@ -54,22 +61,22 @@ export async function installBun(): Promise<string> {
   const binDir = path.join(installDir, 'bin')
   const bunFile = path.join(binDir, 'bun')
 
-  core.info(`Set Bun install directory: ${cyan(bunFile)}`)
+  logDebug(`Set Bun install directory: ${cyan(bunFile)}`)
 
   if (!isWin) {
-    core.info(`Install from shell script <https://bun.sh/install>`)
+    logDebug(`Install from shell script <https://bun.sh/install>`)
     await execCommand('curl -fsSL https://bun.sh/install -o /tmp/bun-install.sh')
     await execCommand('bash /tmp/bun-install.sh')
   }
   else {
-    core.info(`Install from shell script <https://bun.sh/install.ps1>`)
+    logDebug(`Install from shell script <https://bun.sh/install.ps1>`)
     await execCommand('powershell -c "irm bun.sh/install.ps1 | iex"')
   }
 
   const version = await exec.getExecOutput(`${bunFile} --version`, [], { silent: true })
-  core.info(`Bun version: ${cyan(version.stdout.trim())}`)
-  core.info(`Spend Time: ${cyan(performance.now() - startTime)}ms`)
-  core.endGroup()
+  logDebug(`Bun version: ${cyan(version.stdout.trim())}`)
+  logDebug(`Spend Time: ${cyan(performance.now() - startTime)}ms`)
+  isDebug && core.endGroup()
 
   return bunFile
 }
@@ -115,7 +122,7 @@ export async function renderTemplates(
       const content = handlebars.compile(templateContent)(answers)
       // write to dest file
       await fs.writeFile(destPath, content, 'utf-8')
-      core.info(`Render ${cyan(templatePath)} to ${cyan(destPath)}`)
+      logDebug(`Render ${cyan(templatePath)} to ${cyan(destPath)}`)
     }
   }
 }
@@ -142,7 +149,7 @@ export async function writeTemplates(): Promise<string> {
   await fs.writeFile(path.join(srcDir, 'index.ts'), revertFile(TPL_SRC_INDEX_TS), 'utf-8')
 
   // 查看模板文件
-  await core.group('Template Files', async () => {
+  isDebug && await core.group('Template Files', async () => {
     const files = await fs.readdir(tplDir, { recursive: true })
     for await (const file of files) {
       const tempFile = path.join(tplDir, file)
