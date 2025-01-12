@@ -28,7 +28,7 @@ import { isDebug } from './config.js'
     if (error) {
       core.warning(error)
     }
-    core.warning(`${e.message}\nFailed to execute command: ${cmd}`)
+    core.warning(`${e.message}, Failed to execute command: ${cmd}`)
     return ''
   }
 }
