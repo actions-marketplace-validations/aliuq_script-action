@@ -43,8 +43,7 @@ export async function execCommand(command: string, args?: string[], options?: ex
     if (error) {
       core.warning(error)
     }
-    core.warning(e.message)
-    core.setFailed(`Failed to execute command: ${cmd}`)
+    core.warning(`${e.message}\nFailed to execute command: ${cmd}`)
     return ''
   }
 }

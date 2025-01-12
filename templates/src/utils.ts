@@ -5,7 +5,7 @@ import { isDebug } from './config.js'
 /**
  * Execute a command and return the output
  */
-export async function execCommand(command: string, args?: string[], options?: exec.ExecOptions): Promise<string> {
+ export async function execCommand(command: string, args?: string[], options?: exec.ExecOptions): Promise<string> {
   let output = ''
   let error = ''
   const cmd = command + (args ? ` ${args.join(' ')}` : '')
@@ -28,8 +28,7 @@ export async function execCommand(command: string, args?: string[], options?: ex
     if (error) {
       core.warning(error)
     }
-    core.warning(e.message)
-    core.setFailed(`Failed to execute command: ${cmd}`)
+    core.warning(`${e.message}\nFailed to execute command: ${cmd}`)
     return ''
   }
 }
