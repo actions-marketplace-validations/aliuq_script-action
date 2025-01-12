@@ -18,7 +18,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "sh scripts/build.sh",
+    "dev": "bash scripts/build.sh watch",
+    "build": "bash scripts/build.sh",
     "lint": "eslint .",
     "release": "bun run build && bunx bumpp --push --tag --commit --all && bunx changelogithub"
   },
