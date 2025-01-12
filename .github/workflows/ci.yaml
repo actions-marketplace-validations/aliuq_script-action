@@ -1,6 +1,11 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'dist/**'
   workflow_dispatch:
     inputs:
       debug:
