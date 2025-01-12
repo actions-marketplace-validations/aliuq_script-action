@@ -47,7 +47,7 @@ async function run(): Promise<void> {
 
     // Handle auto install
     if (enableBun && autoInstall) {
-      core.info(yellow(`auto_install is enabled, deleting node_modules(${moduleDir}) directory`))
+      logDebug(`auto_install is enabled, deleting node_modules(${yellow(moduleDir)}) directory`)
       // Only deleting the `node_modules` directory can ensure triggering bun's automatic installation
       await exist(moduleDir) && await fs.rm(moduleDir, { recursive: true })
     }
@@ -86,8 +86,9 @@ async function run(): Promise<void> {
     await core.group('Output Script', async () => core.info(await fs.readFile(mainFile, 'utf-8')))
 
     // Print the important message
-    core.info(yellow(`CWD: ${cyan(tmpDir)}`))
-    core.info(yellow(`Project Dir: ${cyan(process.cwd())}`))
+    core.info(yellow(`Current work directory: ${cyan(tmpDir)}`))
+    core.info(yellow(`Github workspace Dir: ${cyan(process.cwd())}`))
+    core.info(yellow(`If you want to use the workspace directory, please use the environment variable: ${cyan('process.env.GITHUB_WORKSPACE')}`))
 
     // Run script
     if (enableBun) {
